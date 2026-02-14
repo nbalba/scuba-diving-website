@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Clock, Users, ArrowDown, Check } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Badge from "@/components/ui/Badge";
@@ -41,8 +42,18 @@ export default async function TripDetailPage({
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-deep-700 via-ocean-700 to-ocean-800 py-24">
-        <Container>
+      <section className="relative overflow-hidden bg-gradient-to-br from-deep-700 via-ocean-700 to-ocean-800 py-24">
+        {trip.imagePath && (
+          <Image
+            src={trip.imagePath}
+            alt={trip.title}
+            fill
+            className="object-cover opacity-30"
+            sizes="100vw"
+            priority
+          />
+        )}
+        <Container className="relative z-10">
           <div className="max-w-3xl">
             {destination && (
               <Link
@@ -69,9 +80,16 @@ export default async function TripDetailPage({
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              {/* Image placeholder */}
-              <div className="mb-10 flex aspect-video items-center justify-center rounded-xl bg-gradient-to-br from-ocean-500 to-deep-600 text-white/40">
-                {trip.title}
+              <div className="relative mb-10 aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-ocean-500 to-deep-600">
+                {trip.imagePath && (
+                  <Image
+                    src={trip.imagePath}
+                    alt={trip.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                  />
+                )}
               </div>
 
               {/* Description */}

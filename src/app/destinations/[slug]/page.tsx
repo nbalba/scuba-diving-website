@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Thermometer, Eye, ArrowDown, Calendar } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Badge from "@/components/ui/Badge";
@@ -47,7 +48,17 @@ export default async function DestinationDetailPage({
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-ocean-700 via-ocean-600 to-deep-700 py-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-ocean-700 via-ocean-600 to-deep-700 py-32">
+        {destination.imagePath && (
+          <Image
+            src={destination.imagePath}
+            alt={destination.name}
+            fill
+            className="object-cover opacity-40"
+            sizes="100vw"
+            priority
+          />
+        )}
         <Container className="relative z-10 text-center">
           <Badge variant={destination.difficulty} className="mb-4">
             {destination.difficulty}

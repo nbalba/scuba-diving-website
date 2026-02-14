@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { Clock, Users } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { getTripBySlug } from "@/data/trips";
@@ -34,9 +35,16 @@ export default function TripSummary() {
 
   return (
     <div className="rounded-xl border border-ocean-100 bg-white p-6 shadow-sm">
-      {/* Image placeholder */}
-      <div className="mb-4 flex aspect-video items-center justify-center rounded-lg bg-gradient-to-br from-ocean-500 to-deep-600 text-sm text-white/40">
-        {trip.title}
+      <div className="relative mb-4 aspect-video overflow-hidden rounded-lg bg-gradient-to-br from-ocean-500 to-deep-600">
+        {trip.imagePath && (
+          <Image
+            src={trip.imagePath}
+            alt={trip.title}
+            fill
+            className="object-cover"
+            sizes="400px"
+          />
+        )}
       </div>
 
       <Badge variant={trip.difficulty} className="mb-2">

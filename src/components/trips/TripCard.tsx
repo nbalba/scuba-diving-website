@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Clock, Users } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/utils";
@@ -10,13 +11,18 @@ export default function TripCard({ trip }: { trip: Trip }) {
       href={`/trips/${trip.slug}`}
       className="group block overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg"
     >
-      {/* Image placeholder */}
       <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-deep-500 to-ocean-700">
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-white/50">
-          {trip.title}
-        </div>
+        {trip.imagePath && (
+          <Image
+            src={trip.imagePath}
+            alt={trip.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        )}
         {trip.originalPrice && (
-          <div className="absolute right-3 top-3 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
+          <div className="absolute right-3 top-3 z-10 rounded-full bg-coral-500 px-3 py-1 text-xs font-bold text-white">
             Save {formatPrice(trip.originalPrice - trip.price)}
           </div>
         )}

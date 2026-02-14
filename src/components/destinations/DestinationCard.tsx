@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Badge from "@/components/ui/Badge";
 import type { Destination } from "@/lib/types";
 
@@ -12,11 +13,16 @@ export default function DestinationCard({
       href={`/destinations/${destination.slug}`}
       className="group block overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg"
     >
-      {/* Image placeholder */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-ocean-500 to-deep-600">
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-white/50">
-          {destination.name}
-        </div>
+        {destination.imagePath && (
+          <Image
+            src={destination.imagePath}
+            alt={destination.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-xl font-bold text-white">{destination.name}</h3>

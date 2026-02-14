@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import type { BlogPost } from "@/lib/types";
 
@@ -8,9 +9,16 @@ export default function BlogCard({ post }: { post: BlogPost }) {
       href={`/blog/${post.slug}`}
       className="group block overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg"
     >
-      {/* Image placeholder */}
-      <div className="aspect-[16/9] bg-gradient-to-br from-ocean-400 to-deep-600 flex items-center justify-center text-sm text-white/40">
-        {post.title}
+      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-ocean-400 to-deep-600">
+        {post.imagePath && (
+          <Image
+            src={post.imagePath}
+            alt={post.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        )}
       </div>
 
       <div className="p-5">

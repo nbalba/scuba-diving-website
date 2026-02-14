@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Container from "@/components/ui/Container";
 import BlogCard from "@/components/blog/BlogCard";
@@ -74,9 +75,17 @@ export default async function BlogPostPage({
       {/* Content */}
       <section className="py-16">
         <Container className="max-w-3xl">
-          {/* Image placeholder */}
-          <div className="mb-10 flex aspect-video items-center justify-center rounded-xl bg-gradient-to-br from-ocean-400 to-deep-600 text-white/40">
-            {post.title}
+          <div className="relative mb-10 aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-ocean-400 to-deep-600">
+            {post.imagePath && (
+              <Image
+                src={post.imagePath}
+                alt={post.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+                priority
+              />
+            )}
           </div>
 
           <div

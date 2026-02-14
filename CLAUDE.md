@@ -6,7 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run dev` — Start development server (Next.js, hot reload on http://localhost:3000)
 - `npm run build` — Production build
-- `npm run lint` — Run ESLint (`eslint` with flat config)
+- `npm start` — Serve production build (run `npm run build` first)
+- `npm run lint` — Run ESLint (flat config: `eslint-config-next/core-web-vitals` + `typescript`)
 
 No test framework is configured.
 
@@ -42,6 +43,7 @@ Pages use the App Router in `src/app/`:
 - `/contact`, `/about`, `/not-found.tsx`
 - `/auth/login`, `/auth/callback`, `/auth/signup` — Salesforce OAuth flow
 - `/admin` — Dashboard with sub-pages for destinations, trips, blog, testimonials, bookings, contacts (auth-gated)
+- `/api/auth/token`, `/api/auth/userinfo` — Server-side proxies to Salesforce OAuth endpoints (avoids CORS)
 
 Dynamic route pages use `params: Promise<{ slug: string }>` (Next.js 16 async params pattern).
 
@@ -79,3 +81,7 @@ Requires a Salesforce Developer org with:
 - Seed data via `npx tsx scripts/seed-salesforce.ts` (needs `SF_ACCESS_TOKEN` and `SF_INSTANCE_URL` env vars)
 
 Environment variables are in `.env.local` — set `NEXT_PUBLIC_USE_SALESFORCE=true` to activate.
+
+### Images
+
+Static images live in `public/images/`. Currently only `destinations/` has real images; `trips/` and `blog/` directories need placeholder or real images to display properly.
