@@ -54,25 +54,26 @@ export async function getAuthUrl(): Promise<{
 
 /**
  * Exchange an authorization code for access + refresh tokens.
+ * Uses a server-side proxy to avoid CORS issues with the Salesforce token endpoint.
  */
 export async function exchangeCodeForTokens(
   code: string,
   codeVerifier: string
 ): Promise<TokenResponse> {
-  const res = await fetch(
-    `${SF_CONFIG.communityUrl}/services/oauth2/token`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
+  const res = await fetch("/api/auth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      communityUrl: SF_CONFIG.communityUrl,
+      params: {
         grant_type: "authorization_code",
         client_id: SF_CONFIG.clientId,
         redirect_uri: SF_CONFIG.redirectUri,
         code,
         code_verifier: codeVerifier,
-      }),
-    }
-  );
+      },
+    }),
+  });
 
   if (!res.ok) {
     const err = await res.json();
@@ -84,22 +85,23 @@ export async function exchangeCodeForTokens(
 
 /**
  * Refresh an expired access token.
+ * Uses a server-side proxy to avoid CORS issues with the Salesforce token endpoint.
  */
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<TokenResponse> {
-  const res = await fetch(
-    `${SF_CONFIG.communityUrl}/services/oauth2/token`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
+  const res = await fetch("/api/auth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      communityUrl: SF_CONFIG.communityUrl,
+      params: {
         grant_type: "refresh_token",
         client_id: SF_CONFIG.clientId,
         refresh_token: refreshToken,
-      }),
-    }
-  );
+      },
+    }),
+  });
 
   if (!res.ok) {
     const err = await res.json();
@@ -111,17 +113,17 @@ export async function refreshAccessToken(
 
 /**
  * Fetch the current user's identity info.
+ * Uses a server-side proxy to avoid CORS issues.
  */
 export async function getCurrentUser(
   accessToken: string,
   instanceUrl: string
 ): Promise<SalesforceUser> {
-  const res = await fetch(
-    `${instanceUrl}/services/oauth2/userinfo`,
-    {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    }
-  );
+  const res = await fetch("/api/auth/userinfo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ instanceUrl, accessToken }),
+  });
 
   if (!res.ok) {
     throw new Error("Failed to fetch user info");
