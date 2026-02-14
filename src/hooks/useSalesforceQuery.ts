@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/salesforce/AuthContext";
 import { USE_SALESFORCE } from "@/lib/salesforce/config";
 
@@ -21,6 +21,8 @@ export function useSalesforceQuery<T>(
   staticData: T
 ): QueryResult<T> {
   const { accessToken, instanceUrl, isLoading: authLoading } = useAuth();
+  const staticRef = useRef(staticData);
+
   const [state, setState] = useState<QueryResult<T>>({
     data: USE_SALESFORCE ? null : staticData,
     loading: USE_SALESFORCE,
@@ -29,7 +31,6 @@ export function useSalesforceQuery<T>(
 
   useEffect(() => {
     if (!USE_SALESFORCE) {
-      setState({ data: staticData, loading: false, error: null });
       return;
     }
 
@@ -37,7 +38,7 @@ export function useSalesforceQuery<T>(
 
     if (!accessToken || !instanceUrl) {
       // No auth — use static fallback
-      setState({ data: staticData, loading: false, error: null });
+      setState({ data: staticRef.current, loading: false, error: null });
       return;
     }
 
@@ -52,7 +53,7 @@ export function useSalesforceQuery<T>(
       .catch((err) => {
         if (!cancelled) {
           setState({
-            data: staticData, // fall back to static on error
+            data: staticRef.current,
             loading: false,
             error: err instanceof Error ? err.message : "Fetch failed",
           });
@@ -62,7 +63,7 @@ export function useSalesforceQuery<T>(
     return () => {
       cancelled = true;
     };
-  }, [accessToken, instanceUrl, authLoading, sfFetcher, staticData]);
+  }, [accessToken, instanceUrl, authLoading, sfFetcher]);
 
   return state;
 }

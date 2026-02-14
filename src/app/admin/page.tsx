@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Map, Ship, FileText, Star, CalendarCheck, Mail } from "lucide-react";
 import { destinations } from "@/data/destinations";
 import { trips } from "@/data/trips";
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
-          <a
+          <Link
             key={stat.label}
             href={stat.href}
             className="flex items-center gap-4 rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
@@ -72,7 +73,7 @@ export default function AdminDashboard() {
               <p className="text-2xl font-bold text-ocean-900">{stat.count}</p>
               <p className="text-sm text-ocean-500">{stat.label}</p>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>
