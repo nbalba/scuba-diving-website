@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Waves } from "lucide-react";
+import { Menu, X, Waves, LogOut, User } from "lucide-react";
 import Container from "@/components/ui/Container";
+import { useAuth } from "@/lib/salesforce/AuthContext";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -15,6 +16,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, user, login, logout, isLoading } = useAuth();
 
   return (
     <nav className="fixed top-0 z-50 w-full bg-ocean-950/95 backdrop-blur-sm">
@@ -45,6 +47,48 @@ export default function Navbar() {
             >
               Book Now
             </Link>
+
+            {/* Auth buttons */}
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href="/admin"
+                      className="text-sm font-medium text-ocean-200 transition-colors hover:text-white"
+                    >
+                      Admin
+                    </Link>
+                    <span className="flex items-center gap-1.5 text-sm text-ocean-300">
+                      <User className="h-4 w-4" />
+                      {user?.name || "Account"}
+                    </span>
+                    <button
+                      onClick={logout}
+                      className="flex items-center gap-1 text-sm text-ocean-400 transition-colors hover:text-white"
+                      aria-label="Log out"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={login}
+                      className="text-sm font-medium text-ocean-200 transition-colors hover:text-white"
+                    >
+                      Log In
+                    </button>
+                    <Link
+                      href="/auth/signup"
+                      className="rounded-lg border border-ocean-400 px-4 py-2 text-sm font-medium text-ocean-200 transition-colors hover:bg-ocean-900 hover:text-white"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -83,6 +127,51 @@ export default function Navbar() {
             >
               Book Now
             </Link>
+
+            {/* Mobile auth */}
+            {!isLoading && (
+              <div className="border-t border-ocean-800 pt-3">
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/admin"
+                      className="block rounded-lg px-3 py-2.5 text-base font-medium text-ocean-200 transition-colors hover:bg-ocean-900 hover:text-white"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileOpen(false);
+                      }}
+                      className="block w-full rounded-lg px-3 py-2.5 text-left text-base font-medium text-ocean-200 transition-colors hover:bg-ocean-900 hover:text-white"
+                    >
+                      Log Out ({user?.name})
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        login();
+                        setMobileOpen(false);
+                      }}
+                      className="block w-full rounded-lg px-3 py-2.5 text-left text-base font-medium text-ocean-200 transition-colors hover:bg-ocean-900 hover:text-white"
+                    >
+                      Log In
+                    </button>
+                    <Link
+                      href="/auth/signup"
+                      className="block rounded-lg px-3 py-2.5 text-base font-medium text-ocean-200 transition-colors hover:bg-ocean-900 hover:text-white"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

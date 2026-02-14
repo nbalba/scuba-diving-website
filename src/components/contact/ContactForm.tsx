@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/lib/salesforce/AuthContext";
+import { sfCreate } from "@/lib/salesforce/client";
+import { toSfContactSubmission } from "@/lib/salesforce/mappers";
+import { USE_SALESFORCE } from "@/lib/salesforce/config";
 
 export default function ContactForm() {
+  const { accessToken, instanceUrl } = useAuth();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -10,6 +16,7 @@ export default function ContactForm() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function validate() {
@@ -22,13 +29,30 @@ export default function ContactForm() {
     return errs;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
-    if (Object.keys(errs).length === 0) {
-      setSubmitted(true);
+    if (Object.keys(errs).length > 0) return;
+
+    if (USE_SALESFORCE && accessToken && instanceUrl) {
+      setSubmitting(true);
+      try {
+        await sfCreate(
+          "Contact_Submission__c",
+          toSfContactSubmission(form),
+          accessToken,
+          instanceUrl
+        );
+      } catch (err) {
+        setErrors({ submit: err instanceof Error ? err.message : "Submission failed. Please try again." });
+        setSubmitting(false);
+        return;
+      }
+      setSubmitting(false);
     }
+
+    setSubmitted(true);
   }
 
   function update(field: string, value: string) {
@@ -117,11 +141,18 @@ export default function ContactForm() {
         {errors.message && <p className={errorClass}>{errors.message}</p>}
       </div>
 
+      {errors.submit && (
+        <p className="rounded-lg bg-coral-50 p-3 text-sm text-coral-600">
+          {errors.submit}
+        </p>
+      )}
+
       <button
         type="submit"
-        className="w-full rounded-lg bg-ocean-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-2"
+        disabled={submitting}
+        className="w-full rounded-lg bg-ocean-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-ocean-700 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-2 disabled:opacity-50"
       >
-        Send Message
+        {submitting ? "Sending..." : "Send Message"}
       </button>
     </form>
   );

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import BlogCard from "@/components/blog/BlogCard";
-import { blogPosts } from "@/data/blog-posts";
+import BlogList from "@/components/blog/BlogList";
 
 export const metadata: Metadata = {
   title: "Dive Blog",
@@ -32,11 +31,7 @@ export default function BlogPage() {
             title="Latest Posts"
             subtitle="Insights and advice for divers of all levels"
           />
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post) => (
-              <BlogCard key={post.slug} post={post} />
-            ))}
-          </div>
+          <BlogList />
         </Container>
       </section>
     </>

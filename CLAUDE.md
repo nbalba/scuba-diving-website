@@ -14,12 +14,21 @@ No test framework is configured.
 
 **Next.js 16 App Router** site for "DeepBlue Diving", a scuba diving trip booking website. Uses React 19, TypeScript (strict), and Tailwind CSS v4.
 
-### Data Layer
+### Data Layer (Hybrid: Static + Salesforce)
 
-All data is static — no database or API. Content lives in `src/data/` as typed arrays with lookup helpers:
-- `destinations.ts` — `Destination[]` with `getDestinationBySlug()`, `getFeaturedDestinations()`
-- `trips.ts` — `Trip[]` with `getTripBySlug()`, `getTripsByDestination()`, `getFeaturedTrips()`. Trips reference destinations via `destinationSlug`.
-- `blog-posts.ts`, `testimonials.ts` — static content arrays
+Static data in `src/data/` serves as the default and fallback. When `NEXT_PUBLIC_USE_SALESFORCE=true`, the app fetches from Salesforce REST API instead.
+
+**Static data** (`src/data/`): `destinations.ts`, `trips.ts`, `blog-posts.ts`, `testimonials.ts` — typed arrays with lookup helpers (e.g. `getDestinationBySlug()`). Trips reference destinations via `destinationSlug`.
+
+**Salesforce integration** (`src/lib/salesforce/`):
+- `config.ts` — env-based config, `USE_SALESFORCE` feature flag
+- `auth.ts` — OAuth 2.0 Authorization Code + PKCE flow for Salesforce Communities
+- `client.ts` — Generic REST API functions: `sfQuery`, `sfCreate`, `sfUpdate`, `sfDelete`
+- `mappers.ts` — Bidirectional mappers between Salesforce field names and app types
+- `queries.ts` — SOQL query functions for each object type
+- `AuthContext.tsx` — React context providing `accessToken`, `login()`, `logout()`, `handleCallback()`
+
+**Data fetching hook** (`src/hooks/useSalesforceQuery.ts`): Takes a Salesforce fetcher and static fallback; returns `{ data, loading, error }`. Falls back to static data when Salesforce is disabled or on error.
 
 Types for all data models are in `src/lib/types.ts`. This includes `BookingFormData` and `ContactFormData` for forms.
 
@@ -31,6 +40,8 @@ Pages use the App Router in `src/app/`:
 - `/blog` (list) and `/blog/[slug]` (detail)
 - `/booking` — booking form, accepts `?trip=<slug>` query param to preselect
 - `/contact`, `/about`, `/not-found.tsx`
+- `/auth/login`, `/auth/callback`, `/auth/signup` — Salesforce OAuth flow
+- `/admin` — Dashboard with sub-pages for destinations, trips, blog, testimonials, bookings, contacts (auth-gated)
 
 Dynamic route pages use `params: Promise<{ slug: string }>` (Next.js 16 async params pattern).
 
@@ -41,7 +52,9 @@ Dynamic route pages use `params: Promise<{ slug: string }>` (Next.js 16 async pa
 - `src/components/home/` — Homepage sections (Hero, FeaturedDestinations, WhyChooseUs, etc.)
 - `src/components/destinations/`, `trips/`, `blog/`, `booking/`, `contact/` — Page-specific components
 
-Client components (`"use client"`) are used only where needed: `Navbar`, `BookingForm`, `ContactForm`.
+- `src/components/admin/` — `AdminTable` reusable table component for admin CRUD pages
+
+Client components (`"use client"`) are used for interactive/data-fetching: `Navbar`, `BookingForm`, `ContactForm`, `FeaturedDestinations`, `FeaturedTrips`, `Testimonials`, `DestinationsList`, `BlogList`, all admin pages, and auth pages.
 
 ### Styling
 
@@ -56,3 +69,13 @@ Uses `clsx` via `cn()` helper in `src/lib/utils.ts` for conditional class mergin
 ### Path Aliases
 
 `@/*` maps to `./src/*` (configured in tsconfig.json).
+
+### Salesforce Setup
+
+Requires a Salesforce Developer org with:
+- Custom objects: `Destination__c`, `Trip__c`, `Blog_Post__c`, `Testimonial__c`, `Booking__c`, `Contact_Submission__c`
+- Connected App with OAuth (Authorization Code + PKCE) and CORS allowed origins
+- Experience Cloud (Communities) for customer authentication
+- Seed data via `npx tsx scripts/seed-salesforce.ts` (needs `SF_ACCESS_TOKEN` and `SF_INSTANCE_URL` env vars)
+
+Environment variables are in `.env.local` — set `NEXT_PUBLIC_USE_SALESFORCE=true` to activate.

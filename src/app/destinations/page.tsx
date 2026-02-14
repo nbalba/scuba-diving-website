@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import DestinationCard from "@/components/destinations/DestinationCard";
-import { destinations } from "@/data/destinations";
+import DestinationsList from "@/components/destinations/DestinationsList";
 
 export const metadata: Metadata = {
   title: "Dive Destinations",
@@ -33,14 +32,7 @@ export default function DestinationsPage() {
             title="All Destinations"
             subtitle="Choose your next underwater adventure"
           />
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {destinations.map((destination) => (
-              <DestinationCard
-                key={destination.slug}
-                destination={destination}
-              />
-            ))}
-          </div>
+          <DestinationsList />
         </Container>
       </section>
     </>

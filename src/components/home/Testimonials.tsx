@@ -1,9 +1,20 @@
+"use client";
+
 import { Star } from "lucide-react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { testimonials } from "@/data/testimonials";
+import { testimonials as staticTestimonials } from "@/data/testimonials";
+import { fetchTestimonials } from "@/lib/salesforce/queries";
+import { useSalesforceQuery } from "@/hooks/useSalesforceQuery";
 
 export default function Testimonials() {
+  const { data: testimonials } = useSalesforceQuery(
+    fetchTestimonials,
+    staticTestimonials
+  );
+
+  if (!testimonials || testimonials.length === 0) return null;
+
   return (
     <section className="bg-ocean-50 py-20">
       <Container>

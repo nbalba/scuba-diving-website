@@ -3,10 +3,15 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { trips } from "@/data/trips";
+import { useAuth } from "@/lib/salesforce/AuthContext";
+import { sfCreate } from "@/lib/salesforce/client";
+import { toSfBooking } from "@/lib/salesforce/mappers";
+import { USE_SALESFORCE } from "@/lib/salesforce/config";
 
 export default function BookingForm() {
   const searchParams = useSearchParams();
   const preselectedTrip = searchParams.get("trip") || "";
+  const { accessToken, instanceUrl } = useAuth();
 
   const [form, setForm] = useState({
     tripSlug: preselectedTrip,
@@ -20,6 +25,7 @@ export default function BookingForm() {
     specialRequests: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function validate() {
@@ -36,13 +42,39 @@ export default function BookingForm() {
     return errs;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
-    if (Object.keys(errs).length === 0) {
-      setSubmitted(true);
+    if (Object.keys(errs).length > 0) return;
+
+    if (USE_SALESFORCE && accessToken && instanceUrl) {
+      setSubmitting(true);
+      try {
+        await sfCreate(
+          "Booking__c",
+          toSfBooking({
+            preferredDate: form.preferredDate,
+            numberOfDivers: form.numberOfDivers,
+            certificationLevel: form.certificationLevel,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone,
+            specialRequests: form.specialRequests,
+          }),
+          accessToken,
+          instanceUrl
+        );
+      } catch (err) {
+        setErrors({ submit: err instanceof Error ? err.message : "Submission failed. Please try again." });
+        setSubmitting(false);
+        return;
+      }
+      setSubmitting(false);
     }
+
+    setSubmitted(true);
   }
 
   function update(field: string, value: string | number) {
@@ -213,11 +245,18 @@ export default function BookingForm() {
         />
       </div>
 
+      {errors.submit && (
+        <p className="rounded-lg bg-coral-50 p-3 text-sm text-coral-600">
+          {errors.submit}
+        </p>
+      )}
+
       <button
         type="submit"
-        className="w-full rounded-lg bg-coral-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-coral-600 focus:outline-none focus:ring-2 focus:ring-coral-500 focus:ring-offset-2"
+        disabled={submitting}
+        className="w-full rounded-lg bg-coral-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-coral-600 focus:outline-none focus:ring-2 focus:ring-coral-500 focus:ring-offset-2 disabled:opacity-50"
       >
-        Submit Booking Request
+        {submitting ? "Submitting..." : "Submit Booking Request"}
       </button>
     </form>
   );
