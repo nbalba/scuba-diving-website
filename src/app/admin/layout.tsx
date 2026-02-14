@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { useAuth } from "@/lib/salesforce/AuthContext";
+import { USE_SALESFORCE } from "@/lib/salesforce/config";
 import { cn } from "@/lib/utils";
 
 const adminLinks = [
@@ -33,33 +34,35 @@ export default function AdminLayout({
   const { isAuthenticated, isLoading, login } = useAuth();
   const pathname = usePathname();
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-ocean-200 border-t-ocean-600" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-ocean-900">
-            Admin Access Required
-          </h1>
-          <p className="mt-2 text-ocean-600">
-            Please sign in to access the admin dashboard.
-          </p>
-          <button
-            onClick={login}
-            className="mt-4 rounded-lg bg-ocean-600 px-6 py-3 font-semibold text-white hover:bg-ocean-700"
-          >
-            Sign In
-          </button>
+  if (USE_SALESFORCE) {
+    if (isLoading) {
+      return (
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-ocean-200 border-t-ocean-600" />
         </div>
-      </div>
-    );
+      );
+    }
+
+    if (!isAuthenticated) {
+      return (
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-ocean-900">
+              Admin Access Required
+            </h1>
+            <p className="mt-2 text-ocean-600">
+              Please sign in to access the admin dashboard.
+            </p>
+            <button
+              onClick={login}
+              className="mt-4 rounded-lg bg-ocean-600 px-6 py-3 font-semibold text-white hover:bg-ocean-700"
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+      );
+    }
   }
 
   return (
