@@ -1,26 +1,61 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Ocean Color Palette */
+  --color-ocean-50: #f0f9ff;
+  --color-ocean-100: #e0f2fe;
+  --color-ocean-200: #bae6fd;
+  --color-ocean-300: #7dd3fc;
+  --color-ocean-400: #38bdf8;
+  --color-ocean-500: #0ea5e9;
+  --color-ocean-600: #0284c7;
+  --color-ocean-700: #0369a1;
+  --color-ocean-800: #075985;
+  --color-ocean-900: #0c4a6e;
+  --color-ocean-950: #082f49;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Teal / Deep Water */
+  --color-deep-50: #f0fdfa;
+  --color-deep-100: #ccfbf1;
+  --color-deep-200: #99f6e4;
+  --color-deep-300: #5eead4;
+  --color-deep-400: #2dd4bf;
+  --color-deep-500: #14b8a6;
+  --color-deep-600: #0d9488;
+  --color-deep-700: #0f766e;
+  --color-deep-800: #115e59;
+  --color-deep-900: #134e4a;
+  --color-deep-950: #042f2e;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Sandy / Warm Tones */
+  --color-sand-50: #fefce8;
+  --color-sand-100: #fef9c3;
+  --color-sand-200: #fef08a;
+  --color-sand-300: #fde047;
+  --color-sand-400: #facc15;
+  --color-sand-500: #eab308;
+  --color-sand-600: #ca8a04;
+  --color-sand-700: #a16207;
+  --color-sand-800: #854d0e;
+  --color-sand-900: #713f12;
+  --color-sand-950: #422006;
+
+  /* Coral Accent */
+  --color-coral-50: #fff7ed;
+  --color-coral-100: #ffedd5;
+  --color-coral-400: #fb923c;
+  --color-coral-500: #f97316;
+  --color-coral-600: #ea580c;
+  --color-coral-700: #c2410c;
+
+  /* Typography */
+  --font-heading: var(--font-inter);
+  --font-body: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  color: var(--color-ocean-900);
+  background: #ffffff;
 }
