@@ -9,22 +9,20 @@ import { useAuth } from "@/lib/salesforce/AuthContext";
 function CallbackHandler() {
   const searchParams = useSearchParams();
   const { handleCallback } = useAuth();
-  const [error, setError] = useState<string | null>(null);
+  const [asyncError, setAsyncError] = useState<string | null>(null);
+
+  const errorParam = searchParams.get("error");
+  const errorDesc = searchParams.get("error_description");
+  const code = searchParams.get("code");
+
+  const paramError = errorParam
+    ? (errorDesc || errorParam)
+    : !code
+      ? "No authorization code received."
+      : null;
 
   useEffect(() => {
-    const code = searchParams.get("code");
-    const errorParam = searchParams.get("error");
-    const errorDesc = searchParams.get("error_description");
-
-    if (errorParam) {
-      setError(errorDesc || errorParam);
-      return;
-    }
-
-    if (!code) {
-      setError("No authorization code received.");
-      return;
-    }
+    if (paramError || !code) return;
 
     handleCallback(code)
       .then(() => {
@@ -34,9 +32,11 @@ function CallbackHandler() {
         window.location.href = returnUrl;
       })
       .catch((err) => {
-        setError(err instanceof Error ? err.message : "Authentication failed");
+        setAsyncError(err instanceof Error ? err.message : "Authentication failed");
       });
-  }, [searchParams, handleCallback]);
+  }, [code, paramError, handleCallback]);
+
+  const error = paramError || asyncError;
 
   if (error) {
     return (

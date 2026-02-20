@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import BlogList from "@/components/blog/BlogList";
+import { getBlogPosts } from "@/lib/salesforce/server-queries";
 
 export const metadata: Metadata = {
   title: "Dive Blog",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
     "Tips, guides, and stories from the underwater world. Your resource for all things scuba diving.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getBlogPosts();
+
   return (
     <>
       {/* Hero */}
@@ -31,7 +34,7 @@ export default function BlogPage() {
             title="Latest Posts"
             subtitle="Insights and advice for divers of all levels"
           />
-          <BlogList />
+          <BlogList posts={posts} />
         </Container>
       </section>
     </>

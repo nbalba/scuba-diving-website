@@ -5,8 +5,14 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Container from "@/components/ui/Container";
 import BlogCard from "@/components/blog/BlogCard";
-import { blogPosts, getBlogPostBySlug } from "@/data/blog-posts";
+import { blogPosts } from "@/data/blog-posts";
+import {
+  getBlogPostBySlug,
+  getBlogPosts,
+} from "@/lib/salesforce/server-queries";
 import { formatDate } from "@/lib/utils";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return blogPosts.map((p) => ({ slug: p.slug }));
@@ -18,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlug(slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -32,10 +38,11 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlug(slug);
   if (!post) notFound();
 
-  const relatedPosts = blogPosts
+  const allPosts = await getBlogPosts();
+  const relatedPosts = allPosts
     .filter((p) => p.slug !== slug)
     .slice(0, 2);
 

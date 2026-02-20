@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Waves } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { useAuth } from "@/lib/salesforce/AuthContext";
@@ -7,8 +8,13 @@ import { useAuth } from "@/lib/salesforce/AuthContext";
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = "/";
+    }
+  }, [isAuthenticated]);
+
   if (isAuthenticated) {
-    window.location.href = "/";
     return null;
   }
 

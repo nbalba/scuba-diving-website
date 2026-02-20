@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Shield, Leaf, Compass, Users } from "lucide-react";
+import { Shield, Leaf, Compass } from "lucide-react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 

@@ -32,26 +32,25 @@ function mapBooking(r: SfRecord): Booking {
 
 export default function AdminBookings() {
   const { accessToken, instanceUrl } = useAuth();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<Booking[] | null>(null);
+
+  const shouldFetch = USE_SALESFORCE && !!accessToken && !!instanceUrl;
 
   useEffect(() => {
-    if (!USE_SALESFORCE || !accessToken || !instanceUrl) {
-      setLoading(false);
-      return;
-    }
+    if (!shouldFetch) return;
 
     sfQuery(
       `SELECT Id, First_Name__c, Last_Name__c, Email__c, Preferred_Date__c,
               Number_of_Divers__c, Certification_Level__c, Status__c
        FROM Booking__c ORDER BY CreatedDate DESC`,
-      accessToken,
-      instanceUrl
+      accessToken!,
+      instanceUrl!
     )
       .then((result) => setBookings(result.records.map(mapBooking)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [accessToken, instanceUrl]);
+      .catch(() => setBookings([]));
+  }, [shouldFetch, accessToken, instanceUrl]);
+
+  const loading = shouldFetch && bookings === null;
 
   if (loading) {
     return (
@@ -78,7 +77,7 @@ export default function AdminBookings() {
             </tr>
           </thead>
           <tbody>
-            {bookings.length === 0 ? (
+            {!bookings?.length ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-ocean-400">
                   {USE_SALESFORCE
@@ -87,7 +86,7 @@ export default function AdminBookings() {
                 </td>
               </tr>
             ) : (
-              bookings.map((b) => (
+              (bookings ?? []).map((b) => (
                 <tr
                   key={b.id}
                   className="border-b border-ocean-50 hover:bg-ocean-50/50"

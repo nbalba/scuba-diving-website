@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import DestinationsList from "@/components/destinations/DestinationsList";
+import { getDestinations } from "@/lib/salesforce/server-queries";
 
 export const metadata: Metadata = {
   title: "Dive Destinations",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
     "Explore world-class scuba diving destinations from the Great Barrier Reef to the cenotes of Mexico.",
 };
 
-export default function DestinationsPage() {
+export default async function DestinationsPage() {
+  const destinations = await getDestinations();
+
   return (
     <>
       {/* Hero */}
@@ -32,7 +35,7 @@ export default function DestinationsPage() {
             title="All Destinations"
             subtitle="Choose your next underwater adventure"
           />
-          <DestinationsList />
+          <DestinationsList destinations={destinations} />
         </Container>
       </section>
     </>

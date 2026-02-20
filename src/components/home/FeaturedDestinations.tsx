@@ -1,19 +1,14 @@
-"use client";
-
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import DestinationCard from "@/components/destinations/DestinationCard";
-import { getFeaturedDestinations } from "@/data/destinations";
-import { fetchFeaturedDestinations } from "@/lib/salesforce/queries";
-import { useSalesforceQuery } from "@/hooks/useSalesforceQuery";
+import type { Destination } from "@/lib/types";
 
-export default function FeaturedDestinations() {
-  const { data: destinations } = useSalesforceQuery(
-    fetchFeaturedDestinations,
-    getFeaturedDestinations()
-  );
-
-  if (!destinations || destinations.length === 0) return null;
+export default function FeaturedDestinations({
+  destinations,
+}: {
+  destinations: Destination[];
+}) {
+  if (destinations.length === 0) return null;
 
   return (
     <section className="py-20">

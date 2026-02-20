@@ -1,19 +1,10 @@
-"use client";
-
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import TripCard from "@/components/trips/TripCard";
-import { getFeaturedTrips } from "@/data/trips";
-import { fetchFeaturedTrips } from "@/lib/salesforce/queries";
-import { useSalesforceQuery } from "@/hooks/useSalesforceQuery";
+import type { Trip } from "@/lib/types";
 
-export default function FeaturedTrips() {
-  const { data: trips } = useSalesforceQuery(
-    fetchFeaturedTrips,
-    getFeaturedTrips()
-  );
-
-  if (!trips || trips.length === 0) return null;
+export default function FeaturedTrips({ trips }: { trips: Trip[] }) {
+  if (trips.length === 0) return null;
 
   return (
     <section className="py-20">

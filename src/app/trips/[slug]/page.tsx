@@ -6,9 +6,14 @@ import { Clock, Users, ArrowDown, Check } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { trips, getTripBySlug } from "@/data/trips";
-import { getDestinationBySlug } from "@/data/destinations";
+import { trips } from "@/data/trips";
+import {
+  getTripBySlug,
+  getDestinationBySlug,
+} from "@/lib/salesforce/server-queries";
 import { formatPrice, formatDate } from "@/lib/utils";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return trips.map((t) => ({ slug: t.slug }));
@@ -20,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const trip = getTripBySlug(slug);
+  const trip = await getTripBySlug(slug);
   if (!trip) return {};
   return {
     title: trip.title,
@@ -34,10 +39,10 @@ export default async function TripDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const trip = getTripBySlug(slug);
+  const trip = await getTripBySlug(slug);
   if (!trip) notFound();
 
-  const destination = getDestinationBySlug(trip.destinationSlug);
+  const destination = await getDestinationBySlug(trip.destinationSlug);
 
   return (
     <>

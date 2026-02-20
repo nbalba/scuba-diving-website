@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   useCallback,
   type ReactNode,
 } from "react";
@@ -68,31 +67,27 @@ function clearAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    accessToken: null,
-    refreshToken: null,
-    instanceUrl: null,
-    user: null,
-    isAuthenticated: false,
-    isLoading: true,
-  });
-
-  // Restore session from localStorage on mount
-  useEffect(() => {
+  const [state, setState] = useState<AuthState>(() => {
     const stored = loadStoredAuth();
     if (stored.accessToken && stored.instanceUrl) {
-      setState({
+      return {
         accessToken: stored.accessToken || null,
         refreshToken: stored.refreshToken || null,
         instanceUrl: stored.instanceUrl || null,
         user: (stored.user as SalesforceUser) || null,
         isAuthenticated: true,
         isLoading: false,
-      });
-    } else {
-      setState((prev) => ({ ...prev, isLoading: false }));
+      };
     }
-  }, []);
+    return {
+      accessToken: null,
+      refreshToken: null,
+      instanceUrl: null,
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    };
+  });
 
   const login = useCallback(async () => {
     const { url, codeVerifier } = await getAuthUrl();

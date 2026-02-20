@@ -28,25 +28,24 @@ function mapContact(r: SfRecord): ContactSubmission {
 
 export default function AdminContacts() {
   const { accessToken, instanceUrl } = useAuth();
-  const [contacts, setContacts] = useState<ContactSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [contacts, setContacts] = useState<ContactSubmission[] | null>(null);
+
+  const shouldFetch = USE_SALESFORCE && !!accessToken && !!instanceUrl;
 
   useEffect(() => {
-    if (!USE_SALESFORCE || !accessToken || !instanceUrl) {
-      setLoading(false);
-      return;
-    }
+    if (!shouldFetch) return;
 
     sfQuery(
       `SELECT Id, Name, Email__c, Subject__c, Message__c, Status__c
        FROM Contact_Submission__c ORDER BY CreatedDate DESC`,
-      accessToken,
-      instanceUrl
+      accessToken!,
+      instanceUrl!
     )
       .then((result) => setContacts(result.records.map(mapContact)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [accessToken, instanceUrl]);
+      .catch(() => setContacts([]));
+  }, [shouldFetch, accessToken, instanceUrl]);
+
+  const loading = shouldFetch && contacts === null;
 
   if (loading) {
     return (
@@ -74,7 +73,7 @@ export default function AdminContacts() {
             </tr>
           </thead>
           <tbody>
-            {contacts.length === 0 ? (
+            {!contacts?.length ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-ocean-400">
                   {USE_SALESFORCE
@@ -83,7 +82,7 @@ export default function AdminContacts() {
                 </td>
               </tr>
             ) : (
-              contacts.map((c) => (
+              (contacts ?? []).map((c) => (
                 <tr
                   key={c.id}
                   className="border-b border-ocean-50 hover:bg-ocean-50/50"

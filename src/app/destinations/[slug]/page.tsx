@@ -6,8 +6,13 @@ import Container from "@/components/ui/Container";
 import Badge from "@/components/ui/Badge";
 import SectionHeading from "@/components/ui/SectionHeading";
 import TripCard from "@/components/trips/TripCard";
-import { destinations, getDestinationBySlug } from "@/data/destinations";
-import { getTripsByDestination } from "@/data/trips";
+import { destinations } from "@/data/destinations";
+import {
+  getDestinationBySlug,
+  getTripsByDestination,
+} from "@/lib/salesforce/server-queries";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return destinations.map((d) => ({ slug: d.slug }));
@@ -19,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const destination = getDestinationBySlug(slug);
+  const destination = await getDestinationBySlug(slug);
   if (!destination) return {};
   return {
     title: destination.name,
@@ -33,10 +38,10 @@ export default async function DestinationDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const destination = getDestinationBySlug(slug);
+  const destination = await getDestinationBySlug(slug);
   if (!destination) notFound();
 
-  const trips = getTripsByDestination(slug);
+  const trips = await getTripsByDestination(slug);
 
   const stats = [
     { icon: Calendar, label: "Best Season", value: destination.bestSeason },
